@@ -33,6 +33,9 @@ public class Chromosome implements Serializable {
         this.quantityOfRestrictions = chromosome.getQuantityOfRestrictions();
     }
 
+    public void addBrokenRestriction() {
+        this.quantityOfRestrictions++;
+    }
 
     public Chromosome clone(){
 
@@ -59,4 +62,22 @@ public class Chromosome implements Serializable {
         return this.quantityOfRestrictions;
     }
 
+
+    //Setters
+
+    public void setDna(ArrayList<Integer> dna) {
+        this.dna = dna;
+    }
+
+    public void setFitnessDistance(double fitnessDistance) {
+        this.fitnessDistance = fitnessDistance;
+    }
+
+    public void setFitnessRoutes(double fitnessRoutes) {
+        this.fitnessRoutes = fitnessRoutes;
+    }
+
+    public void setQuantityOfRestrictions(int quantityOfRestrictions) {
+        this.quantityOfRestrictions = quantityOfRestrictions;
+    }
 }
