@@ -9,19 +9,20 @@ import java.util.*;
 
 public class Solver implements Serializable{
 
-    private final static Random RANDOM_NUMBER = new Random();
-    public final static Environment environment = new Environment();
+    private final Random RANDOM_NUMBER = new Random();
+    public final Environment environment = new Environment();
+    public int crossoverType = 0;
 
     //Initialize Solver with the environment restrictions
 
 
-    public static List<Chromosome> solve(List<Chromosome> population, int maxGeneration, int limitOfIndividuals) {
+    public List<Chromosome> solve(List<Chromosome> population, int maxGeneration, int limitOfIndividuals) {
 
         for (int i = 0; i < maxGeneration; i++) {
 
             evaluateIndividuals(population, environment);
 
-            List<Chromosome> selectedBestIndividuals = elitism(population, 10);
+            List<Chromosome> selectedBestIndividuals = elitism(population, (int)Math.ceil(limitOfIndividuals*0.10));
 
             List<Chromosome> selectedIndividuals = selectIndividuals(population, limitOfIndividuals);
 
@@ -42,7 +43,7 @@ public class Solver implements Serializable{
         return population;
     }
 
-    public static List<Chromosome> selectIndividuals(List<Chromosome> population, int limitOfIndividuals) {
+    public List<Chromosome> selectIndividuals(List<Chromosome> population, int limitOfIndividuals) {
         int randomNumber = RANDOM_NUMBER.nextInt(100) % 3;
 
         switch (randomNumber) {
@@ -56,20 +57,23 @@ public class Solver implements Serializable{
 
     }
 
-    public static List<Chromosome> crossoverIndividuals(List<Chromosome> population) {
-        int randomNumber = RANDOM_NUMBER.nextInt(100) % 3;
+    public List<Chromosome> crossoverIndividuals(List<Chromosome> population) {
+//        int randomNumber = RANDOM_NUMBER.nextInt(100) % 4;
+//        int randomNumber = 0;
 
-        switch (randomNumber) {
+        switch (crossoverType) {
             case 0:
                 return crossoverOX(population);
             case 1:
                 return crossoverCX(population);
+            case 2:
+                return crossoverTemp(population);
             default:
                 return crossoverPMX(population);
         }
     }
 
-    public static void evaluateIndividuals(List<Chromosome> population, Environment environment) {
+    public void evaluateIndividuals(List<Chromosome> population, Environment environment) {
         for (Chromosome chromosome : population) {
             environment.fixChromosome(chromosome);
             environment.firstEvaluationMethod(chromosome);
@@ -77,7 +81,7 @@ public class Solver implements Serializable{
         }
     }
 
-    public static List<Chromosome> elitism(List<Chromosome> population, int limitIndividuals) {
+    public List<Chromosome> elitism(List<Chromosome> population, int limitIndividuals) {
 
         List<Chromosome> newPopulation = new ArrayList<>();
 
@@ -99,7 +103,7 @@ public class Solver implements Serializable{
         return newPopulation;
     }
 
-    public static List<Chromosome> rouletteSelection(List<Chromosome> population, int limitOfIndividuals) {
+    public List<Chromosome> rouletteSelection(List<Chromosome> population, int limitOfIndividuals) {
         List<Chromosome> selectedIndividuals = new ArrayList<>();
 
         int sum = 0;
@@ -130,7 +134,7 @@ public class Solver implements Serializable{
         return selectedIndividuals;
     }
 
-    public static List<Chromosome> randomSelection(List<Chromosome> population, int limitOfIndividuals) {
+    public List<Chromosome> randomSelection(List<Chromosome> population, int limitOfIndividuals) {
 
         List<Chromosome> selectedIndividuals = new ArrayList<>();
 
@@ -147,7 +151,7 @@ public class Solver implements Serializable{
 
     }
 
-    public static List<Chromosome> tournamentSelection(List<Chromosome> population, int limitOfIndividuals) {
+    public List<Chromosome> tournamentSelection(List<Chromosome> population, int limitOfIndividuals) {
         List<Chromosome> selectedIndividuals = new ArrayList<>();
         List<Chromosome> newPopulation = new ArrayList<>();
 
@@ -173,7 +177,7 @@ public class Solver implements Serializable{
         return newPopulation;
     }
 
-    public static List<Chromosome> crossoverOX(List<Chromosome> population) {
+    public List<Chromosome> crossoverOX(List<Chromosome> population) {
 
         List<Chromosome> newPopulation = new ArrayList<>(population);
 
@@ -208,7 +212,7 @@ public class Solver implements Serializable{
         return newPopulation;
     }
 
-    public static List<Chromosome> crossoverCX(List<Chromosome> population) {
+    public List<Chromosome> crossoverCX(List<Chromosome> population) {
 
         List<Chromosome> newPopulation = new ArrayList<>(population);
 
@@ -250,7 +254,7 @@ public class Solver implements Serializable{
         return newPopulation;
     }
 
-    public static List<Chromosome> crossoverPMX(List<Chromosome> population) {
+    public List<Chromosome> crossoverPMX(List<Chromosome> population) {
 
         List<Chromosome> newPopulation = new ArrayList<>(population);
 
@@ -281,19 +285,66 @@ public class Solver implements Serializable{
         return population;
     }
 
-    public static void mutation(List<Chromosome> population){
 
-        int randomNumber = RANDOM_NUMBER.nextInt(101);
+    public List<Chromosome> crossoverTemp(List<Chromosome> population){
+        List<Chromosome> newPopulation = new ArrayList<>(population);
 
-        if(randomNumber <= 70){
+        for(int i = 0; i<population.size(); i++){
+            for(int j = 0; j<population.size(); j++){
+
+                if (i == j) continue;
+
+                int cutPoint = RANDOM_NUMBER.nextInt(population.get(i).getDna().size());
+
+                ArrayList<Integer> newDna = new ArrayList<>();
+
+                for(int k = 0; k<Math.min(population.get(i).getDna().size(), population.get(j).getDna().size()); k++){
+                    if(population.get(i).getDna().get(k) == population.get(j).getDna().get(k)){
+                        newDna.add(population.get(i).getDna().get(k));
+                    } else{
+                        int randomGeneParent = RANDOM_NUMBER.nextInt(2);
+
+                        if(population.get(i).getDna().size() <= k){
+                            randomGeneParent = 1;
+                        }
+                        if(population.get(j).getDna().size() <= k){
+                            randomGeneParent = 0;
+                        }
+
+                        if(randomGeneParent == 0){
+                            newDna.add(population.get(i).getDna().get(k));
+                        } else{
+                            newDna.add(population.get(j).getDna().get(k));
+                        }
+                    }
+                }
+
+                newPopulation.add(new Chromosome(newDna, 0, 0));
+
+
+            }
+        }
+
+        return population;
+
+    }
+
+
+    public void mutation(List<Chromosome> population){
+
+        int randomMutation = RANDOM_NUMBER.nextInt(101);
+        int reverseMutation = RANDOM_NUMBER.nextInt(101);
+
+        if(randomMutation <= 5){
             randomMutation(population);
-        } else{
+        }
+        if(reverseMutation <= 5) {
             reverseMutation(population);
         }
 
     }
 
-    public static void randomMutation(List<Chromosome> population) {
+    public void randomMutation(List<Chromosome> population) {
 
         if(population.size() == 0)return;
 
@@ -315,12 +366,12 @@ public class Solver implements Serializable{
 
     }
 
-    public static void reverseMutation(List<Chromosome> population){
+    public void reverseMutation(List<Chromosome> population){
         Collections.reverse(population);
     }
 
-    /*
-    public static void readInput() throws IOException{
+
+    public void readInput() throws IOException{
 
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
         BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(System.out));
@@ -370,7 +421,6 @@ public class Solver implements Serializable{
             environment.getCosts()[id-1] = demand;
         }
 
-
         for(int i = 0; i<quantityOfNodes; i++){
 
             for(int j = i+1; j<quantityOfNodes; j++){
@@ -382,13 +432,9 @@ public class Solver implements Serializable{
 
         }
 
-
-
     }
 
-    */
-
-
+/*
     public static void readInput() throws IOException{
 
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
@@ -460,6 +506,6 @@ public class Solver implements Serializable{
 
 
     }
-
+*/
 
 }

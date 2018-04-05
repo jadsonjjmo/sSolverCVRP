@@ -1,5 +1,6 @@
 package geneticAlgorithm;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.TreeSet;
@@ -8,7 +9,7 @@ import java.util.TreeSet;
  * @author Jadson Oliveira <jadsonjjmo@gmail.com>
  */
 
-public class Environment {
+public class Environment implements Serializable {
 
     private double mutationRate;
     private double elitismRate;

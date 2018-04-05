@@ -12,9 +12,9 @@ import java.util.stream.Collectors;
 
 public class Population implements Serializable {
 
-    private List<Chromosome> population;
-    private int generation;
-    private static final int LIMIT_OF_INDIVIDUALS = 60;
+    public List<Chromosome> population;
+    public int generation;
+    public static final int LIMIT_OF_INDIVIDUALS = 10;
 
 
     public Population() {
@@ -33,7 +33,7 @@ public class Population implements Serializable {
         return listOfPopulations;
     }
 
-
+/*
     public Population evolve() {
 
         final int maxGeneration = 20;
@@ -43,10 +43,10 @@ public class Population implements Serializable {
 
         return this;
     }
+    */
 
 
     public static Population combine(Population population1, Population population2) {
-
         List<Chromosome> individuals = new ArrayList<>(population1.getPopulation());
         individuals.addAll(population2.getPopulation());
         Collections.sort(individuals, (chromosome1, chromosome2) -> {
@@ -77,7 +77,8 @@ public class Population implements Serializable {
         population = new ArrayList<>();
 
         //TODO: Change it to a Logger
-        System.out.println("Generating initial population...");
+//        System.out.println("Generating initial population...");
+/*
 
         //Creating dna in order
         for (int i = 0; i < LIMIT_OF_INDIVIDUALS / 3; i++) {
@@ -106,10 +107,11 @@ public class Population implements Serializable {
 
             population.add(new Chromosome(newDna, 0, 0));
         }
+*/
 
 
         //Creating dna in random order
-        for (int i = 0; i < LIMIT_OF_INDIVIDUALS / 3; i++) {
+        for (int i = 0; i < LIMIT_OF_INDIVIDUALS; i++) {
 
             //TODO: improve it!
 
@@ -133,7 +135,7 @@ public class Population implements Serializable {
 
         }
 
-        System.out.println("Initial population successfully generated!");
+//        System.out.println("Initial population successfully generated!");
 
     }
 
